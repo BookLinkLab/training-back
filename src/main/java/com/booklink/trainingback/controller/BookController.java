@@ -1,11 +1,8 @@
 package com.booklink.trainingback.controller;
 
-import com.booklink.trainingback.model.Book;
+import com.booklink.trainingback.dto.BookDto;
 import com.booklink.trainingback.service.BookService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,9 +15,18 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    //listar
     @PostMapping
-    public List<Book> getAllBooks() {
+    public List<BookDto> getAllBooks() {
         return this.bookService.getAllBooks();
+    }
+
+    @GetMapping("/{id}")
+    public BookDto getBook(@PathVariable Long id) {
+        return this.bookService.getBook(id);
+    }
+
+    @GetMapping("/{ISBN}")
+    public BookDto getBook(@PathVariable Integer ISBN){
+        return this.bookService.getBook(ISBN);
     }
 }
