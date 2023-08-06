@@ -1,12 +1,13 @@
 package com.booklink.trainingback.model;
 
+import com.booklink.trainingback.dto.CreateAuthorDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -23,8 +24,17 @@ public class Author {
 
     private String nationality;
 
-    private Date dateOfBirth;
+    private String dateOfBirth;
 
+    @JsonIgnore
     @ManyToMany
-    List<Book> book;
+    List<Book> books;
+
+    public static Author from(CreateAuthorDto createAuthorDto) {
+        return Author.builder()
+                .name(createAuthorDto.getName())
+                .nationality(createAuthorDto.getNationality())
+                .dateOfBirth(createAuthorDto.getDateOfBirth())
+                .build();
+    }
 }

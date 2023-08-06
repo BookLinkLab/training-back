@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -16,18 +15,18 @@ import java.util.List;
 @Builder
 public class BookDto {
     private Long id;
-    private Integer ISBN;
+    private Long isbn;
     private String title;
-    private Date publishDate;
-    private List<Author> author;
+    private String publishDate;
+    private List<Author> authors;
 
     public static BookDto from(Book book) {
         return BookDto.builder()
                 .id(book.getId())
-                .ISBN(book.getISBN())
+                .isbn(book.getIsbn())
                 .title(book.getTitle())
                 .publishDate(book.getPublishDate())
-                .author(book.getAuthor())
+                .authors(book.getAuthors())
                 .build();
     }
 }
