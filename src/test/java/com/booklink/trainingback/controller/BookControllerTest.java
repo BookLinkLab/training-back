@@ -60,6 +60,30 @@ public class BookControllerTest {
     }
 
     @Test
+    void createBookAuthorDoesntExistException() {
+        CreateBookDto createBookDto = CreateBookDto.builder()
+                .isbn(9781338878951L)
+                .title("Harry Potter and The Goblet of Fire")
+                .publishDate("08/07/2000")
+                .authorIds(List.of(9L))
+                .build();
+        ResponseEntity<BookDto> response = this.restTemplate.exchange(this.baseUrl, HttpMethod.POST, new HttpEntity<>(createBookDto), BookDto.class);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
+    void createBookAlreadyExistsException() {
+        CreateBookDto createBookDto = CreateBookDto.builder()
+                .isbn(9781338878950L)
+                .title("Harry Potter and The Goblet of Fire")
+                .publishDate("08/07/2000")
+                .authorIds(List.of(1L))
+                .build();
+        ResponseEntity<BookDto> response = this.restTemplate.exchange(this.baseUrl, HttpMethod.POST, new HttpEntity<>(createBookDto), BookDto.class);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
     void deleteBook() {
         ResponseEntity<?> response = this.restTemplate.exchange(
                 this.baseUrl + "/1", HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {
