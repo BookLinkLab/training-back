@@ -25,16 +25,16 @@ public class BookService {
     }
 
     public BookDto createBook(CreateBookDto bookDto) {
-        List<Author> author = this.authorRepository.findAllById(bookDto.getAuthorsId());
-        if (author.size() < bookDto.getAuthorsId().size()) {
+        List<Author> authors = this.authorRepository.findAllById(bookDto.getAuthorsId());
+        if (authors.size() < bookDto.getAuthorsId().size()) {
             throw new RuntimeException("One or more author IDs not found");
         }
         if (this.bookRepository.findByIsbn(bookDto.getIsbn()).isPresent()) {
             throw new BookAlreadyExistsException("Book with isbn %d already exists".formatted(bookDto.getIsbn()));
         }
-        Book bookToSave = Book.from(bookDto, author);
+        Book bookToSave = Book.from(bookDto, authors);
         Book savedBook = this.bookRepository.save(bookToSave);
-        author.forEach(a -> a.getBooks().add(savedBook));
+        authors.forEach(a -> a.getBooks().add(savedBook));
         return BookDto.from(savedBook);
     }
 

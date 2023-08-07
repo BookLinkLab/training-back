@@ -1,6 +1,7 @@
 package com.booklink.trainingback.model;
 
 import com.booklink.trainingback.dto.CreateBookDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +26,7 @@ public class Book {
 
     private String publishDate;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Author> authors;
 
     public static Book from(CreateBookDto bookDto, List<Author> authors) {

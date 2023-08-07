@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,7 +28,7 @@ public class Author {
     private String dateOfBirth;
 
     @JsonIgnore
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     List<Book> books;
 
     public static Author from(CreateAuthorDto createAuthorDto) {
@@ -35,6 +36,7 @@ public class Author {
                 .name(createAuthorDto.getName())
                 .nationality(createAuthorDto.getNationality())
                 .dateOfBirth(createAuthorDto.getDateOfBirth())
+                .books(new ArrayList<>())
                 .build();
     }
 }
