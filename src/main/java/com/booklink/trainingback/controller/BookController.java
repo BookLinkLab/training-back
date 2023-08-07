@@ -2,6 +2,7 @@ package com.booklink.trainingback.controller;
 
 import com.booklink.trainingback.dto.BookDto;
 import com.booklink.trainingback.dto.CreateBookDto;
+import com.booklink.trainingback.exception.NotFoundException;
 import com.booklink.trainingback.service.BookService;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +33,13 @@ public class BookController {
     }
 
     @GetMapping("/template/{template}")
-    public List<BookDto> getAllBooks(@PathVariable String template) {
-        return this.bookService.getAllBooks(template);
+    public List<?> getAllBooks(@PathVariable String template) {
+        if (template.equals("full")) {
+            return this.bookService.getAllBooksFull();
+        } else if (template.equals("basic")) {
+            return this.bookService.getAllBooksBasic();
+        }
+        throw new NotFoundException("Template %s not found".formatted(template));
     }
 
     @GetMapping("/id/{id}")

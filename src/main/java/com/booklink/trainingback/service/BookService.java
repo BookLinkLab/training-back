@@ -1,6 +1,7 @@
 package com.booklink.trainingback.service;
 
 import com.booklink.trainingback.dto.BookDto;
+import com.booklink.trainingback.dto.BookWithAuthorIdDTO;
 import com.booklink.trainingback.dto.CreateBookDto;
 import com.booklink.trainingback.exception.BookAlreadyExistsException;
 import com.booklink.trainingback.exception.NotFoundException;
@@ -64,16 +65,17 @@ public class BookService {
         return BookDto.from(book);
     }
 
-    public List<BookDto> getAllBooks(String template) {
+    public List<BookDto> getAllBooksFull() {
         List<Book> books = this.bookRepository.findAll();
-        if (template.equals("full")) {
-            return books.stream()
-                    .map(BookDto::from)
-                    .toList();
-        } else if (template.equals("basic")) {
-            return null;
-            //TODO just return the authors IDs -> ?new DTO
-        }
-        throw new RuntimeException("Status code %s not found".formatted(template));
+        return books.stream()
+                .map(BookDto::from)
+                .toList();
+    }
+
+    public List<BookWithAuthorIdDTO> getAllBooksBasic() {
+        List<Book> books = this.bookRepository.findAll();
+        return books.stream()
+                .map(BookWithAuthorIdDTO::from)
+                .toList();
     }
 }
