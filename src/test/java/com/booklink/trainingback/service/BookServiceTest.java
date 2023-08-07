@@ -27,7 +27,8 @@ public class BookServiceTest {
 
     @Test
     void happyPathTest() {
-        //create author first
+        assertTrue(this.bookService.getAllBooksFull().isEmpty());
+
         CreateAuthorDto createAuthorDto = CreateAuthorDto.builder()
                 .name("George R. R. Martin")
                 .nationality("United States")
@@ -40,7 +41,7 @@ public class BookServiceTest {
                 .isbn(9781338878950L)
                 .title("Harry Potter and The Goblet of Fire")
                 .publishDate("08/07/2000")
-                .authorsId(List.of(savedAuthor.getId()))
+                .authorIds(List.of(savedAuthor.getId()))
                 .build();
         BookDto savedBook = this.bookService.createBook(createBookDto);
 
@@ -59,7 +60,7 @@ public class BookServiceTest {
                 .isbn(999L)
                 .title("Harry Potter and The Goblet of Fire")
                 .publishDate("08/07/2000")
-                .authorsId(List.of(savedAuthor.getId()))
+                .authorIds(List.of(savedAuthor.getId()))
                 .build();
         this.bookService.updateBook(myBook.getId(), updatedBookData);
         assertEquals(this.bookService.getAllBooksFull().get(0).getIsbn(), 999L);
@@ -81,17 +82,17 @@ public class BookServiceTest {
                 .isbn(9781338878950L)
                 .title("Harry Potter and The Goblet of Fire")
                 .publishDate("08/07/2000")
-                .authorsId(List.of(savedAuthor.getId()))
+                .authorIds(List.of(savedAuthor.getId()))
                 .build();
         this.bookService.createBook(createBookDto);
         assertThrows(BookAlreadyExistsException.class, () -> this.bookService.createBook(createBookDto));
 
-        //author doesnt exist
+
         CreateBookDto createBookDtoNonExistentAuthor = CreateBookDto.builder()
                 .isbn(9781338878951L)
                 .title("Harry Potter and The Goblet of Fire")
                 .publishDate("08/07/2000")
-                .authorsId(List.of(2L))
+                .authorIds(List.of(2L))
                 .build();
         assertThrows(AuthorDoesntExistExcpetion.class, () -> this.bookService.createBook(createBookDtoNonExistentAuthor));
     }

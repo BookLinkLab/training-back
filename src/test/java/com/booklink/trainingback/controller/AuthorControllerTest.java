@@ -35,7 +35,6 @@ public class AuthorControllerTest {
                 .nationality("United States")
                 .dateOfBirth("1948/10/20")
                 .build();
-
         this.restTemplate.postForEntity(this.baseUrl, createAuthorDto, AuthorDto.class);
     }
 
@@ -46,7 +45,6 @@ public class AuthorControllerTest {
                 .nationality("United States")
                 .dateOfBirth("1948/10/20")
                 .build();
-
         ResponseEntity<AuthorDto> response = this.restTemplate.exchange(this.baseUrl, HttpMethod.POST, new HttpEntity<>(createAuthorDto), AuthorDto.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }

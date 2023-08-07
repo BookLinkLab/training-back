@@ -24,13 +24,11 @@ public class AuthorServiceTest {
     void happyPathTest() {
         assertTrue(this.authorService.getAllAuthors().isEmpty());
 
-        //create
         CreateAuthorDto createAuthorDto = CreateAuthorDto.builder()
                 .name("George R. R. Martin")
                 .nationality("United States")
                 .dateOfBirth("1948/10/20")
                 .build();
-
         AuthorDto savedAuthor = this.authorService.createAuthor(createAuthorDto);
 
         List<AuthorDto> allAuthors = this.authorService.getAllAuthors();
@@ -40,17 +38,15 @@ public class AuthorServiceTest {
         AuthorDto author = allAuthors.get(0);
         assertEquals(author, savedAuthor);
 
-        //update
+
         CreateAuthorDto updatedAuthorData = CreateAuthorDto.builder()
                 .name("George Martin")
                 .nationality("United States")
                 .dateOfBirth("1948/10/20")
                 .build();
-
         this.authorService.updateAuthor(author.getId(), updatedAuthorData);
         assertEquals(this.authorService.getAllAuthors().get(0).getName(), "George Martin");
 
-        //delete
         this.authorService.deleteAuthor(1L);
         assertTrue(this.authorService.getAllAuthors().isEmpty());
     }

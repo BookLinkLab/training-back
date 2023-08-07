@@ -26,8 +26,8 @@ public class BookService {
     }
 
     public BookDto createBook(CreateBookDto bookDto) {
-        List<Author> authors = this.authorRepository.findAllById(bookDto.getAuthorsId());
-        if (authors.size() < bookDto.getAuthorsId().size()) {
+        List<Author> authors = this.authorRepository.findAllById(bookDto.getAuthorIds());
+        if (authors.size() < bookDto.getAuthorIds().size()) {
             throw new AuthorDoesntExistExcpetion("One or more author IDs not found");
         }
         if (this.bookRepository.findByIsbn(bookDto.getIsbn()).isPresent()) {
@@ -46,7 +46,7 @@ public class BookService {
 
     public BookDto updateBook(Long id, CreateBookDto bookDto) {
         Book bookToModify = this.bookRepository.findById(id).orElseThrow(() -> new NotFoundException("Book %d not found".formatted(id)));
-        List<Author> updatedAuthors = this.authorRepository.findAllById(bookDto.getAuthorsId());
+        List<Author> updatedAuthors = this.authorRepository.findAllById(bookDto.getAuthorIds());
         bookToModify.setIsbn(bookDto.getIsbn());
         bookToModify.setTitle(bookDto.getTitle());
         bookToModify.setPublishDate(bookDto.getPublishDate());

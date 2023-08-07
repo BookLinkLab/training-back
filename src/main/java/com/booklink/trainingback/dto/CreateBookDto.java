@@ -15,5 +15,5 @@ public class CreateBookDto {
     private Long isbn;
     private String title;
     private String publishDate;
-    private List<Long> authorsId;
+    private List<Long> authorIds;
 }
