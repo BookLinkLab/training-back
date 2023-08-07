@@ -21,14 +21,14 @@ public class AuthorController {
         return this.authorService.createAuthor(authorDto);
     }
 
-    @PutMapping("/{id}")
-    public AuthorDto updateAuthor(@PathVariable Long id, @RequestBody CreateAuthorDto createAuthorDto) {
-        return this.authorService.updateAuthor(id, createAuthorDto);
-    }
-
     @DeleteMapping("{id}")
     public void deleteAuthor(@PathVariable Long id) {
         this.authorService.deleteAuthor(id);
+    }
+
+    @PutMapping("/{id}")
+    public AuthorDto updateAuthor(@PathVariable Long id, @RequestBody CreateAuthorDto createAuthorDto) {
+        return this.authorService.updateAuthor(id, createAuthorDto);
     }
 
     @GetMapping("{id}")
