@@ -3,6 +3,7 @@ package com.booklink.trainingback.service;
 import com.booklink.trainingback.dto.BookDto;
 import com.booklink.trainingback.dto.BookWithAuthorIdDTO;
 import com.booklink.trainingback.dto.CreateBookDto;
+import com.booklink.trainingback.exception.AuthorDoesntExistExcpetion;
 import com.booklink.trainingback.exception.BookAlreadyExistsException;
 import com.booklink.trainingback.exception.NotFoundException;
 import com.booklink.trainingback.model.Author;
@@ -27,7 +28,7 @@ public class BookService {
     public BookDto createBook(CreateBookDto bookDto) {
         List<Author> authors = this.authorRepository.findAllById(bookDto.getAuthorsId());
         if (authors.size() < bookDto.getAuthorsId().size()) {
-            throw new RuntimeException("One or more author IDs not found");
+            throw new AuthorDoesntExistExcpetion("One or more author IDs not found");
         }
         if (this.bookRepository.findByIsbn(bookDto.getIsbn()).isPresent()) {
             throw new BookAlreadyExistsException("Book with isbn %d already exists".formatted(bookDto.getIsbn()));

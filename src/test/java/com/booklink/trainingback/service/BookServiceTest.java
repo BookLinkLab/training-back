@@ -4,6 +4,8 @@ import com.booklink.trainingback.dto.AuthorDto;
 import com.booklink.trainingback.dto.BookDto;
 import com.booklink.trainingback.dto.CreateAuthorDto;
 import com.booklink.trainingback.dto.CreateBookDto;
+import com.booklink.trainingback.exception.AuthorDoesntExistExcpetion;
+import com.booklink.trainingback.exception.BookAlreadyExistsException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -66,4 +68,31 @@ public class BookServiceTest {
         assertTrue(this.bookService.getAllBooksFull().isEmpty());
     }
 
+    @Test
+    void exceptionTest() {
+        CreateAuthorDto createAuthorDto = CreateAuthorDto.builder()
+                .name("George R. R. Martin")
+                .nationality("United States")
+                .dateOfBirth("1948/10/20")
+                .build();
+        AuthorDto savedAuthor = this.authorService.createAuthor(createAuthorDto);
+
+        CreateBookDto createBookDto = CreateBookDto.builder()
+                .isbn(9781338878950L)
+                .title("Harry Potter and The Goblet of Fire")
+                .publishDate("08/07/2000")
+                .authorsId(List.of(savedAuthor.getId()))
+                .build();
+        this.bookService.createBook(createBookDto);
+        assertThrows(BookAlreadyExistsException.class, () -> this.bookService.createBook(createBookDto));
+
+        //author doesnt exist
+        CreateBookDto createBookDtoNonExistentAuthor = CreateBookDto.builder()
+                .isbn(9781338878951L)
+                .title("Harry Potter and The Goblet of Fire")
+                .publishDate("08/07/2000")
+                .authorsId(List.of(2L))
+                .build();
+        assertThrows(AuthorDoesntExistExcpetion.class, () -> this.bookService.createBook(createBookDtoNonExistentAuthor));
+    }
 }
