@@ -62,13 +62,13 @@ public class AuthorControllerTest {
 
     @Test
     void updateAuthor() {
-        CreateAuthorDto updateAuthorDto = CreateAuthorDto.builder()
+        CreateAuthorDto updatedAuthorDto = CreateAuthorDto.builder()
                 .name("George Martin")
                 .nationality("United States")
                 .dateOfBirth("1948/10/20")
                 .build();
 
-        ResponseEntity<AuthorDto> response = this.restTemplate.exchange(this.baseUrl + "/1", HttpMethod.PUT, new HttpEntity<>(updateAuthorDto), AuthorDto.class);
+        ResponseEntity<AuthorDto> response = this.restTemplate.exchange(this.baseUrl + "/1", HttpMethod.PUT, new HttpEntity<>(updatedAuthorDto), AuthorDto.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 

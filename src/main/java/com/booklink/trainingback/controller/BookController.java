@@ -32,16 +32,6 @@ public class BookController {
         return this.bookService.updateBook(id, bookDto);
     }
 
-    @GetMapping("/template/{template}")
-    public List<?> getAllBooks(@PathVariable String template) {
-        if (template.equals("full")) {
-            return this.bookService.getAllBooksFull();
-        } else if (template.equals("basic")) {
-            return this.bookService.getAllBooksBasic();
-        }
-        throw new NotFoundException("Template %s not found".formatted(template));
-    }
-
     @GetMapping("/id/{id}")
     public BookDto getBook(@PathVariable Long id) {
         return this.bookService.getBook(id);
@@ -50,5 +40,15 @@ public class BookController {
     @GetMapping("/isbn/{isbn}")
     public BookDto getBookByIsbn(@PathVariable Long isbn) {
         return this.bookService.getBookByIsbn(isbn);
+    }
+
+    @GetMapping("/template/{template}")
+    public List<?> getAllBooks(@PathVariable String template) {
+        if (template.equals("full")) {
+            return this.bookService.getAllBooksFull();
+        } else if (template.equals("basic")) {
+            return this.bookService.getAllBooksBasic();
+        }
+        throw new NotFoundException("Template %s not found".formatted(template));
     }
 }
