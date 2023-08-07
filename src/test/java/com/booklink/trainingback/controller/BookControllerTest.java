@@ -108,7 +108,7 @@ public class BookControllerTest {
     @Test
     void getBook() {
         ResponseEntity<BookDto> response = this.restTemplate.exchange(
-                this.baseUrl + "/id/1", HttpMethod.GET, null, new ParameterizedTypeReference<BookDto>() {
+                this.baseUrl + "/id/1", HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                 }
         );
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -117,7 +117,7 @@ public class BookControllerTest {
     @Test
     void getBookByIsbn() {
         ResponseEntity<BookDto> response = this.restTemplate.exchange(
-                this.baseUrl + "/isbn/9781338878950", HttpMethod.GET, null, new ParameterizedTypeReference<BookDto>() {
+                this.baseUrl + "/isbn/9781338878950", HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                 }
         );
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -126,13 +126,13 @@ public class BookControllerTest {
     @Test
     void getAllBooks() {
         ResponseEntity<List<BookWithAuthorIdDTO>> responseBasic = this.restTemplate.exchange(
-                this.baseUrl + "/template/basic", HttpMethod.GET, null, new ParameterizedTypeReference<List<BookWithAuthorIdDTO>>() {
+                this.baseUrl + "/template/basic", HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                 }
         );
         assertEquals(HttpStatus.OK, responseBasic.getStatusCode());
 
         ResponseEntity<List<BookDto>> responseFull = this.restTemplate.exchange(
-                this.baseUrl + "/template/full", HttpMethod.GET, null, new ParameterizedTypeReference<List<BookDto>>() {
+                this.baseUrl + "/template/full", HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                 }
         );
         assertEquals(HttpStatus.OK, responseFull.getStatusCode());
