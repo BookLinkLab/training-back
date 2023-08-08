@@ -1,7 +1,5 @@
 package com.booklink.trainingback.model;
 
-import com.booklink.trainingback.dto.author.AuthorDTO;
-import com.booklink.trainingback.dto.book.BookDTO;
 import com.booklink.trainingback.dto.book.CreateBookDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
