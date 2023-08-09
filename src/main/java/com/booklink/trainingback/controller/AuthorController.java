@@ -23,7 +23,7 @@ public class AuthorController {
     }
 
     @PostMapping
-    AuthorDTO createAuthor(CreateAuthorDTO authorDTO) {
+    AuthorDTO createAuthor(@RequestBody CreateAuthorDTO authorDTO) {
         return authorService.create(authorDTO);
     }
 
@@ -35,6 +35,11 @@ public class AuthorController {
     @DeleteMapping
     void deleteAuthor(@RequestParam Long id) {
         authorService.deleteAuthor(id);
+    }
+
+    @PutMapping
+    AuthorDTO updateAuthor(@RequestBody AuthorDTO authorDTO) {
+        return authorService.updateAuthor(authorDTO);
     }
 
 

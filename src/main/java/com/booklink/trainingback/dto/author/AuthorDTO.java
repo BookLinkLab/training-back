@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.text.ParseException;
 import java.util.Date;
 
 @Data
@@ -18,7 +19,7 @@ public class AuthorDTO {
     private String nationality;
     private Date dateOfBirth;
 
-    public static AuthorDTO from(Author author) {
+    public static AuthorDTO from(Author author)  {
         return AuthorDTO.builder()
                 .id(author.getId())
                 .name(author.getName())

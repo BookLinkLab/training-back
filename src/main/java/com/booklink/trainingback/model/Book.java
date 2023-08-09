@@ -21,7 +21,7 @@ public class Book {
     private Long id;
 
     private String title;
-
+    @Column(unique = true)
     private String ISBN;
 
     private Date publicationDate;

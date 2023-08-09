@@ -29,7 +29,7 @@ public class Author {
     private Date dateOfBirth;
 
     @OneToMany(mappedBy = "author")
-    private List<Book> books = new ArrayList<>();
+    private List<Book> books;
 
 
     public static Author from(CreateAuthorDTO authorDTO) {
@@ -37,6 +37,7 @@ public class Author {
                 .name(authorDTO.getName())
                 .dateOfBirth(authorDTO.getDateOfBirth())
                 .nationality(authorDTO.getNationality())
+                .books(new ArrayList<>())
                 .build();
     }
 }

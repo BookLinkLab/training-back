@@ -2,11 +2,11 @@ package com.booklink.trainingback.service.impl;
 
 import com.booklink.trainingback.dto.author.AuthorDTO;
 import com.booklink.trainingback.dto.author.CreateAuthorDTO;
+import com.booklink.trainingback.exception.NotFoundException;
 import com.booklink.trainingback.model.Author;
 import com.booklink.trainingback.repository.AuthorRepository;
 import com.booklink.trainingback.service.AuthorService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -21,14 +21,13 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public AuthorDTO create(CreateAuthorDTO authorDTO) {
         Author author = Author.from(authorDTO);
-        Author newAuthor = authorRepository.save(author);
-        return AuthorDTO.from(newAuthor);
+        return AuthorDTO.from(authorRepository.save(author));
     }
 
     @Override
     public AuthorDTO getAuthor(Long authorId) {
         Optional<Author> optionalAuthor = authorRepository.findById(authorId);
-        Author author = optionalAuthor.orElseThrow(() -> new RuntimeException("Author not found"));
+        Author author = optionalAuthor.orElseThrow(() -> new NotFoundException("Author not found"));
         return AuthorDTO.from(author);
     }
 
@@ -47,7 +46,7 @@ public class AuthorServiceImpl implements AuthorService {
                     author.setDateOfBirth(authorDTO.getDateOfBirth());
                     return authorRepository.save(author);
                 })
-                .orElseThrow(() -> new RuntimeException("Author not found"));
+                .orElseThrow(() -> new NotFoundException("Author not found"));
         return AuthorDTO.from(updatedAuthor);
     }
 

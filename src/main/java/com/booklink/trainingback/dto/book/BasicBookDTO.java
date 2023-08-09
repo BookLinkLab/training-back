@@ -1,6 +1,5 @@
 package com.booklink.trainingback.dto.book;
 
-import com.booklink.trainingback.dto.author.AuthorDTO;
 import com.booklink.trainingback.model.Book;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,20 +12,21 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookDTO {
+public class BasicBookDTO {
     private Long id;
     private String title;
     private String ISBN;
     private Date publicationDate;
-    private AuthorDTO author;
+    private Long authorId;
 
-    public static BookDTO from(Book book) {
-        return BookDTO.builder()
+    public static BasicBookDTO from(Book book) {
+        return BasicBookDTO.builder()
                 .id(book.getId())
                 .title(book.getTitle())
                 .ISBN(book.getISBN())
                 .publicationDate(book.getPublicationDate())
-                .author(AuthorDTO.from(book.getAuthor()))
+                .authorId(book.getAuthor().getId())
                 .build();
     }
 }
+
