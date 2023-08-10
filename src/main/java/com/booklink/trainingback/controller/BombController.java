@@ -4,6 +4,7 @@ import com.booklink.trainingback.dto.bomb.BombDto;
 import com.booklink.trainingback.dto.bomb.CreateBombDto;
 import com.booklink.trainingback.model.BombType;
 import com.booklink.trainingback.service.BombService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class BombController {
     }
 
     @PostMapping
-    public BombDto createBomb(@RequestBody CreateBombDto dto) {
+    public BombDto createBomb(@Valid @RequestBody CreateBombDto dto) {
         return bombService.createBomb(dto);
     }
 
