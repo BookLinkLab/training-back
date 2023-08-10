@@ -1,7 +1,7 @@
 package com.booklink.trainingback.controller;
 
-import com.booklink.trainingback.dto.author.CreateAuthorDto;
-import com.booklink.trainingback.model.Author;
+import com.booklink.trainingback.dto.AuthorDto;
+import com.booklink.trainingback.dto.CreateAuthorDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,63 +29,62 @@ public class AuthorControllerTest {
     private final String baseUrl = "/author";
 
     @BeforeEach
-    void setup(){
+    void setup() {
         CreateAuthorDto createAuthorDto = CreateAuthorDto.builder()
-                .name("Ray Bradbury")
-                .nationality("American")
-                .dateOfBirth(LocalDate.of(1902, 8, 19))
+                .name("George R. R. Martin")
+                .nationality("United States")
+                .dateOfBirth("1948/10/20")
                 .build();
-        restTemplate.postForEntity(baseUrl, createAuthorDto, Author.class);
+        this.restTemplate.postForEntity(this.baseUrl, createAuthorDto, AuthorDto.class);
     }
 
     @Test
-    void createAuthor(){
+    void createAuthor() {
         CreateAuthorDto createAuthorDto = CreateAuthorDto.builder()
-                .name("Ray Bradbury")
-                .nationality("American")
-                .dateOfBirth(LocalDate.of(1902, 8, 19))
+                .name("George R. R. Martin")
+                .nationality("United States")
+                .dateOfBirth("1948/10/20")
                 .build();
-        ResponseEntity<Author> response = restTemplate.exchange(
-                baseUrl, HttpMethod.POST, new HttpEntity<>(createAuthorDto), Author.class
-        );
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        ResponseEntity<AuthorDto> response = this.restTemplate.exchange(this.baseUrl, HttpMethod.POST, new HttpEntity<>(createAuthorDto), AuthorDto.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
-    void getAllAuthors(){
-        ResponseEntity<List<Author>> response = restTemplate.exchange(
-                baseUrl, HttpMethod.GET, null, new ParameterizedTypeReference<List<Author>>() {}
+    void deleteAuthor() {
+        ResponseEntity<?> response = this.restTemplate.exchange(
+                this.baseUrl + "/1", HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {
+                }
         );
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
-    void getAuthor(){
-        ResponseEntity<Author> response = restTemplate.exchange(
-                baseUrl + "/1", HttpMethod.GET, null, Author.class
-        );
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-    }
-
-    @Test
-    void deleteAuthor(){
-        ResponseEntity<Void> response = restTemplate.exchange(
-                baseUrl + "/1", HttpMethod.DELETE, null, Void.class
-        );
-        assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
-    }
-
-    @Test
-    void modifyAuthor(){
-        CreateAuthorDto modifyAuthorDto = CreateAuthorDto.builder()
-                .name("Ray Bradbury")
-                .nationality("British")
-                .dateOfBirth(LocalDate.of(1910, 8, 19))
+    void updateAuthor() {
+        CreateAuthorDto updatedAuthorDto = CreateAuthorDto.builder()
+                .name("George Martin")
+                .nationality("United States")
+                .dateOfBirth("1948/10/20")
                 .build();
-        ResponseEntity<Author> response = restTemplate.exchange(
-                baseUrl + "/1",HttpMethod.PUT, new HttpEntity<>(modifyAuthorDto), Author.class
+
+        ResponseEntity<AuthorDto> response = this.restTemplate.exchange(this.baseUrl + "/1", HttpMethod.PUT, new HttpEntity<>(updatedAuthorDto), AuthorDto.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void getAuthor() {
+        ResponseEntity<AuthorDto> response = this.restTemplate.exchange(
+                this.baseUrl + "/1", HttpMethod.GET, null, new ParameterizedTypeReference<AuthorDto>() {
+                }
         );
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
+    @Test
+    void getAllAuthors() {
+        ResponseEntity<List<AuthorDto>> response = this.restTemplate.exchange(
+                this.baseUrl, HttpMethod.GET, null, new ParameterizedTypeReference<List<AuthorDto>>() {
+                }
+        );
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
 }

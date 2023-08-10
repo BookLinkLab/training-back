@@ -1,18 +1,17 @@
 package com.booklink.trainingback.service;
 
-import com.booklink.trainingback.dto.author.CreateAuthorDto;
-import com.booklink.trainingback.dto.book.BookDto;
-import com.booklink.trainingback.dto.book.CreateBookDto;
-import com.booklink.trainingback.exception.NotFoundException;
-import com.booklink.trainingback.model.Author;
-import com.booklink.trainingback.model.Book;
+import com.booklink.trainingback.dto.AuthorDto;
+import com.booklink.trainingback.dto.BookDto;
+import com.booklink.trainingback.dto.CreateAuthorDto;
+import com.booklink.trainingback.dto.CreateBookDto;
+import com.booklink.trainingback.exception.AuthorDoesntExistExcpetion;
+import com.booklink.trainingback.exception.BookAlreadyExistsException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,73 +20,80 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 public class BookServiceTest {
-
     @Autowired
     private BookService bookService;
     @Autowired
     private AuthorService authorService;
 
     @Test
-    void happyPathTest(){
-        assertTrue(bookService.getFullBooks().isEmpty());
+    void happyPathTest() {
+        assertTrue(this.bookService.getAllBooksFull().isEmpty());
 
         CreateAuthorDto createAuthorDto = CreateAuthorDto.builder()
-                .name("Ray Bradbury")
-                .nationality("American")
-                .dateOfBirth(LocalDate.of(1902, 8, 19))
+                .name("George R. R. Martin")
+                .nationality("United States")
+                .dateOfBirth("1948/10/20")
                 .build();
-        Author savedAuthor = authorService.createAuthor(createAuthorDto);
+        AuthorDto savedAuthor = this.authorService.createAuthor(createAuthorDto);
 
-
-            CreateBookDto createBookDto = CreateBookDto.builder()
-                    .title("Fahrenheit 451")
-                    .isbn(9783060311354L)
-                    .publishDate(LocalDate.of(1953, 10, 19))
-                    .authorId(savedAuthor.getId())
-                    .build();
-        Book savedBook = bookService.createBook(createBookDto);
-
-        List<Book> allBooksFull = bookService.getFullBooks();
-        List<BookDto> allBooksBasic = bookService.getBasicBooks();
-        assertFalse(allBooksFull.isEmpty());
-        assertFalse(allBooksBasic.isEmpty());
-        assertEquals(1, allBooksFull.size());
-        assertEquals(1, allBooksBasic.size());
-
-        Book myBookFull = allBooksFull.get(0);
-        BookDto myBookBasic = allBooksBasic.get(0);
-
-        assertEquals(myBookBasic.getId(), myBookFull.getId());
-
-        assertEquals(savedBook, myBookFull);
-
-        CreateBookDto updatedBookDto = CreateBookDto.builder()
-                .title("Fahrenheit")
-                .isbn(978306031135L)
-                .publishDate(LocalDate.of(1953, 10, 1))
-                .authorId(savedAuthor.getId())
+        assertTrue(this.bookService.getAllBooksFull().isEmpty());
+        CreateBookDto createBookDto = CreateBookDto.builder()
+                .isbn(9781338878950L)
+                .title("Harry Potter and The Goblet of Fire")
+                .publishDate("08/07/2000")
+                .authorIds(List.of(savedAuthor.getId()))
                 .build();
-        Book savedUpdatedBook = bookService.modifyBook(myBookFull.getId(), updatedBookDto);
+        BookDto savedBook = this.bookService.createBook(createBookDto);
 
-        List<Book> updatedBooks = bookService.getFullBooks();
-        assertFalse(updatedBooks.isEmpty());
-        assertEquals(1, updatedBooks.size());
+        List<BookDto> allBooks = this.bookService.getAllBooksFull();
+        assertFalse(allBooks.isEmpty());
+        assertEquals(1, allBooks.size());
 
-        Book myUpdatedBook = updatedBooks.get(0);
-        assertEquals(savedUpdatedBook, myUpdatedBook);
-        assertNotEquals(myUpdatedBook, myBookFull);
+        BookDto myBook = allBooks.get(0);
 
-        Book myBookIsbn = bookService.getBookByIsbn(978306031135L);
-        assertEquals(savedUpdatedBook, myBookIsbn);
+        assertEquals(myBook.getIsbn(), savedBook.getIsbn());
+        assertEquals(myBook.getTitle(), savedBook.getTitle());
+        assertEquals(myBook.getPublishDate(), savedBook.getPublishDate());
+        assertEquals(myBook.getAuthors().get(0).getId(), savedBook.getAuthors().get(0).getId());
 
-        bookService.deleteBook(myUpdatedBook.getId());
-        assertTrue(bookService.getFullBooks().isEmpty());
-        assertTrue(bookService.getBasicBooks().isEmpty());
+        CreateBookDto updatedBookData = CreateBookDto.builder()
+                .isbn(999L)
+                .title("Harry Potter and The Goblet of Fire")
+                .publishDate("08/07/2000")
+                .authorIds(List.of(savedAuthor.getId()))
+                .build();
+        this.bookService.updateBook(myBook.getId(), updatedBookData);
+        assertEquals(this.bookService.getAllBooksFull().get(0).getIsbn(), 999L);
+
+        this.bookService.deleteBook(1L);
+        assertTrue(this.bookService.getAllBooksFull().isEmpty());
     }
 
     @Test
-    void exceptionTest(){
-        assertThrows(NotFoundException.class, () -> bookService.getBook(1L));
-    }
+    void exceptionTest() {
+        CreateAuthorDto createAuthorDto = CreateAuthorDto.builder()
+                .name("George R. R. Martin")
+                .nationality("United States")
+                .dateOfBirth("1948/10/20")
+                .build();
+        AuthorDto savedAuthor = this.authorService.createAuthor(createAuthorDto);
 
+        CreateBookDto createBookDto = CreateBookDto.builder()
+                .isbn(9781338878950L)
+                .title("Harry Potter and The Goblet of Fire")
+                .publishDate("08/07/2000")
+                .authorIds(List.of(savedAuthor.getId()))
+                .build();
+        this.bookService.createBook(createBookDto);
+        assertThrows(BookAlreadyExistsException.class, () -> this.bookService.createBook(createBookDto));
+
+
+        CreateBookDto createBookDtoNonExistentAuthor = CreateBookDto.builder()
+                .isbn(9781338878951L)
+                .title("Harry Potter and The Goblet of Fire")
+                .publishDate("08/07/2000")
+                .authorIds(List.of(2L))
+                .build();
+        assertThrows(AuthorDoesntExistExcpetion.class, () -> this.bookService.createBook(createBookDtoNonExistentAuthor));
+    }
 }

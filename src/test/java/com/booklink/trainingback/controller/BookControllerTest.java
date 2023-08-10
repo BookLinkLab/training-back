@@ -1,10 +1,6 @@
 package com.booklink.trainingback.controller;
 
-import com.booklink.trainingback.dto.author.CreateAuthorDto;
-import com.booklink.trainingback.dto.book.BookDto;
-import com.booklink.trainingback.dto.book.CreateBookDto;
-import com.booklink.trainingback.model.Author;
-import com.booklink.trainingback.model.Book;
+import com.booklink.trainingback.dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,98 +28,113 @@ public class BookControllerTest {
     private final String baseUrl = "/book";
 
     @BeforeEach
-    void setup(){
+    void setup() {
         CreateAuthorDto createAuthorDto = CreateAuthorDto.builder()
-                .name("Ray Bradbury")
-                .nationality("American")
-                .dateOfBirth(LocalDate.of(1902, 8, 19))
+                .name("George R. R. Martin")
+                .nationality("United States")
+                .dateOfBirth("1948/10/20")
                 .build();
         String authorUrl = "/author";
-        restTemplate.postForEntity(authorUrl, createAuthorDto, Author.class);
+        this.restTemplate.postForEntity(authorUrl, createAuthorDto, AuthorDto.class);
 
         CreateBookDto createBookDto = CreateBookDto.builder()
-                .title("Fahrenheit 451")
-                .isbn(9783060311354L)
-                .publishDate(LocalDate.of(1953, 10, 19))
-                .authorId(1L)
+                .isbn(9781338878950L)
+                .title("Harry Potter and The Goblet of Fire")
+                .publishDate("08/07/2000")
+                .authorIds(List.of(1L))
                 .build();
-        restTemplate.postForEntity(baseUrl, createBookDto, Book.class);
+        ResponseEntity<BookDto> response = this.restTemplate.exchange(this.baseUrl, HttpMethod.POST, new HttpEntity<>(createBookDto), BookDto.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
-    void createBook(){
+    void createBook() {
         CreateBookDto createBookDto = CreateBookDto.builder()
-                .title("Fahrenheit 451")
-                .isbn(9783060311354L)
-                .publishDate(LocalDate.of(1953, 10, 19))
-                .authorId(1L)
+                .isbn(9781338878951L)
+                .title("Harry Potter and The Goblet of Fire")
+                .publishDate("08/07/2000")
+                .authorIds(List.of(1L))
                 .build();
-        ResponseEntity<Book> response = restTemplate.exchange(
-                baseUrl, HttpMethod.POST, new HttpEntity<>(createBookDto), Book.class
-        );
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        ResponseEntity<BookDto> response = this.restTemplate.exchange(this.baseUrl, HttpMethod.POST, new HttpEntity<>(createBookDto), BookDto.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
+    @Test
+    void createBookAuthorDoesntExistException() {
+        CreateBookDto createBookDto = CreateBookDto.builder()
+                .isbn(9781338878951L)
+                .title("Harry Potter and The Goblet of Fire")
+                .publishDate("08/07/2000")
+                .authorIds(List.of(9L))
+                .build();
+        ResponseEntity<BookDto> response = this.restTemplate.exchange(this.baseUrl, HttpMethod.POST, new HttpEntity<>(createBookDto), BookDto.class);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
 
     @Test
-    void getBook(){
-        ResponseEntity<Book> response = restTemplate.exchange(
-                baseUrl + "/1", HttpMethod.GET, null, Book.class
+    void createBookAlreadyExistsException() {
+        CreateBookDto createBookDto = CreateBookDto.builder()
+                .isbn(9781338878950L)
+                .title("Harry Potter and The Goblet of Fire")
+                .publishDate("08/07/2000")
+                .authorIds(List.of(1L))
+                .build();
+        ResponseEntity<BookDto> response = this.restTemplate.exchange(this.baseUrl, HttpMethod.POST, new HttpEntity<>(createBookDto), BookDto.class);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
+    void deleteBook() {
+        ResponseEntity<?> response = this.restTemplate.exchange(
+                this.baseUrl + "/1", HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {
+                }
         );
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
+    @Test
+    void updateBook() {
+        CreateBookDto updatedBookDto = CreateBookDto.builder()
+                .isbn(110102121L)
+                .title("Harry Potter and The Goblet of Fire 2")
+                .publishDate("08/07/2000")
+                .authorIds(List.of(1L))
+                .build();
+
+        ResponseEntity<BookDto> response = this.restTemplate.exchange(this.baseUrl + "/1", HttpMethod.PUT, new HttpEntity<>(updatedBookDto), BookDto.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
 
     @Test
-    void getAllBooks(){
-        ResponseEntity<List<Book>> response = restTemplate.exchange(
-                baseUrl, HttpMethod.GET, null, new ParameterizedTypeReference<List<Book>>() {}
+    void getBook() {
+        ResponseEntity<BookDto> response = this.restTemplate.exchange(
+                this.baseUrl + "/id/1", HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                }
         );
         assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
 
-        ResponseEntity<List<Book>> responseFull = restTemplate.exchange(
-                baseUrl + "?template=full", HttpMethod.GET, null, new ParameterizedTypeReference<List<Book>>() {}
+    @Test
+    void getBookByIsbn() {
+        ResponseEntity<BookDto> response = this.restTemplate.exchange(
+                this.baseUrl + "/isbn/9781338878950", HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                }
         );
-        assertEquals(HttpStatus.OK, responseFull.getStatusCode());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
 
-        ResponseEntity<List<BookDto>> responseBasic = restTemplate.exchange(
-                baseUrl + "?template=basic", HttpMethod.GET, null, new ParameterizedTypeReference<List<BookDto>>() {}
+    @Test
+    void getAllBooks() {
+        ResponseEntity<List<BookWithAuthorIdDTO>> responseBasic = this.restTemplate.exchange(
+                this.baseUrl + "/template/basic", HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                }
         );
         assertEquals(HttpStatus.OK, responseBasic.getStatusCode());
 
-        ResponseEntity<?> responseBadRequest = restTemplate.exchange(
-                baseUrl + "?template=none", HttpMethod.GET, null, new ParameterizedTypeReference<>() {}
+        ResponseEntity<List<BookDto>> responseFull = this.restTemplate.exchange(
+                this.baseUrl + "/template/full", HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                }
         );
-        assertEquals(HttpStatus.BAD_REQUEST, responseBadRequest.getStatusCode());
-    }
-
-    @Test
-    void deleteBook(){
-        ResponseEntity<Void> response = restTemplate.exchange(
-                baseUrl + "/1", HttpMethod.DELETE, null, Void.class
-        );
-        assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
-    }
-
-    @Test
-    void modifyBook(){
-        CreateBookDto modifyBookDto = CreateBookDto.builder()
-                .title("Fahrenheit")
-                .isbn(9783060311354L)
-                .publishDate(LocalDate.of(1960, 10, 19))
-                .authorId(1L)
-                .build();
-        ResponseEntity<Book> response = restTemplate.exchange(
-                baseUrl + "/1", HttpMethod.PUT, new HttpEntity<>(modifyBookDto), Book.class
-        );
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-    }
-
-    @Test
-    void getBookByIsbn(){
-        ResponseEntity<Book> response = restTemplate.exchange(
-                baseUrl + "/isbn/9783060311354", HttpMethod.GET, null, Book.class
-        );
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.OK, responseFull.getStatusCode());
     }
 }

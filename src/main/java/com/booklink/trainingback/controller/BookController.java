@@ -1,61 +1,54 @@
 package com.booklink.trainingback.controller;
 
-import com.booklink.trainingback.dto.book.CreateBookDto;
-import com.booklink.trainingback.model.Book;
+import com.booklink.trainingback.dto.BookDto;
+import com.booklink.trainingback.dto.CreateBookDto;
+import com.booklink.trainingback.exception.NotFoundException;
 import com.booklink.trainingback.service.BookService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 @RestController
 @RequestMapping("/book")
 public class BookController {
-
     private final BookService bookService;
 
-    public BookController(BookService bookService){
+    public BookController(BookService bookService) {
         this.bookService = bookService;
     }
 
     @PostMapping
-    public ResponseEntity<Book> createBook(@RequestBody CreateBookDto dto){
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.createBook(dto));
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAllBooks(@RequestParam(name = "template", defaultValue = "full") String template){
-        if (!template.equals("full") && !template.equals("basic")){
-            return ResponseEntity.badRequest().build();
-        }
-        if(template.equals("basic")){
-            return ResponseEntity.ok(bookService.getBasicBooks());
-        }
-        else{
-            return ResponseEntity.ok(bookService.getFullBooks());
-        }
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Book> getBook(@PathVariable Long id){
-        return ResponseEntity.ok(bookService.getBook(id));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Book> modifyBook(@PathVariable Long id, @RequestBody CreateBookDto dto){
-        return ResponseEntity.ok(bookService.modifyBook(id, dto));
+    public BookDto createBook(@RequestBody CreateBookDto bookDto) {
+        return this.bookService.createBook(bookDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long id){
-        bookService.deleteBook(id);
-        return ResponseEntity.accepted().build();
+    public void deleteBook(@PathVariable Long id) {
+        this.bookService.deleteBook(id);
+    }
+
+    @PutMapping("/{id}")
+    public BookDto updateBook(@PathVariable Long id, @RequestBody CreateBookDto bookDto) {
+        return this.bookService.updateBook(id, bookDto);
+    }
+
+    @GetMapping("/id/{id}")
+    public BookDto getBook(@PathVariable Long id) {
+        return this.bookService.getBook(id);
     }
 
     @GetMapping("/isbn/{isbn}")
-    public ResponseEntity<Book> getBookByIsbn(@PathVariable Long isbn){
-        return ResponseEntity.status(HttpStatus.OK).body(bookService.getBookByIsbn(isbn));
+    public BookDto getBookByIsbn(@PathVariable Long isbn) {
+        return this.bookService.getBookByIsbn(isbn);
     }
 
-
+    @GetMapping("/template/{template}")
+    public List<?> getAllBooks(@PathVariable String template) {
+        if (template.equals("full")) {
+            return this.bookService.getAllBooksFull();
+        } else if (template.equals("basic")) {
+            return this.bookService.getAllBooksBasic();
+        }
+        throw new NotFoundException("Template %s not found".formatted(template));
+    }
 }

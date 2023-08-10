@@ -1,59 +1,49 @@
 package com.booklink.trainingback.service;
 
-import com.booklink.trainingback.dto.author.CreateAuthorDto;
+import com.booklink.trainingback.dto.AuthorDto;
+import com.booklink.trainingback.dto.CreateAuthorDto;
 import com.booklink.trainingback.exception.NotFoundException;
 import com.booklink.trainingback.model.Author;
-import com.booklink.trainingback.model.Book;
 import com.booklink.trainingback.repository.AuthorRepository;
-import com.booklink.trainingback.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class AuthorService {
-
     private final AuthorRepository authorRepository;
-    private final BookRepository bookRepository;
 
-    public AuthorService (AuthorRepository authorRepository, BookRepository bookRepository){
+    public AuthorService(AuthorRepository authorRepository) {
         this.authorRepository = authorRepository;
-        this.bookRepository = bookRepository;
     }
 
-    public Author createAuthor(CreateAuthorDto dto){
-        Author author = Author.builder()
-                .name(dto.getName())
-                .nationality(dto.getNationality())
-                .dateOfBirth(dto.getDateOfBirth())
-                .build();
-        return authorRepository.save(author);
+    public AuthorDto createAuthor(CreateAuthorDto authorDto) {
+        Author authorToSave = Author.from(authorDto);
+        Author savedAuthor = this.authorRepository.save(authorToSave);
+        return AuthorDto.from(savedAuthor);
     }
 
-
-    public Author getAuthor(Long id){
-        return authorRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Author %d not found".formatted(id)));
+    public void deleteAuthor(Long id) {
+        Author authorToDelete = this.authorRepository.findById(id).orElseThrow(() -> new NotFoundException("Author %d not found".formatted(id)));
+        this.authorRepository.delete(authorToDelete);
     }
 
-    public List<Author> getAllAuthors(){
-        return authorRepository.findAll();
+    public AuthorDto updateAuthor(Long id, CreateAuthorDto createAuthorDto) {
+        Author authorToUpdate = this.authorRepository.findById(id).orElseThrow(() -> new NotFoundException("Author %d not found".formatted(id)));
+        authorToUpdate.setName(createAuthorDto.getName());
+        authorToUpdate.setNationality(createAuthorDto.getNationality());
+        authorToUpdate.setDateOfBirth(createAuthorDto.getDateOfBirth());
+        Author updatedAuthor = this.authorRepository.save(authorToUpdate);
+        return AuthorDto.from(updatedAuthor);
     }
 
-    public Author modifyAuthor(Long id, CreateAuthorDto dto){
-        Author author = getAuthor(id);
-        author.setName(dto.getName());
-        author.setNationality(dto.getNationality());
-        author.setDateOfBirth(dto.getDateOfBirth());
-        return authorRepository.save(author);
+    public AuthorDto getAuthor(Long id) {
+        Author author = this.authorRepository.findById(id).orElseThrow(() -> new NotFoundException("Author %d not found".formatted(id)));
+        return AuthorDto.from(author);
     }
 
-    public void deleteAuthor(Long id){
-        Author author = getAuthor(id);
-        List<Book> books = bookRepository.findAllByAuthor(author);
-        bookRepository.deleteAll(books);
-        authorRepository.delete(author);
+    public List<AuthorDto> getAllAuthors() {
+        List<Author> authors = this.authorRepository.findAll();
+        return authors.stream().map(AuthorDto::from).toList();
     }
-
-
 }

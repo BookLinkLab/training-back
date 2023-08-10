@@ -1,15 +1,14 @@
 package com.booklink.trainingback.service;
 
-import com.booklink.trainingback.dto.author.CreateAuthorDto;
+import com.booklink.trainingback.dto.AuthorDto;
+import com.booklink.trainingback.dto.CreateAuthorDto;
 import com.booklink.trainingback.exception.NotFoundException;
-import com.booklink.trainingback.model.Author;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,48 +21,38 @@ public class AuthorServiceTest {
     private AuthorService authorService;
 
     @Test
-    void happyPathTest(){
-        assertTrue(authorService.getAllAuthors().isEmpty());
-
+    void happyPathTest() {
+        assertTrue(this.authorService.getAllAuthors().isEmpty());
 
         CreateAuthorDto createAuthorDto = CreateAuthorDto.builder()
-                .name("Ray Bradbury")
-                .nationality("American")
-                .dateOfBirth(LocalDate.of(1902, 8, 19))
+                .name("George R. R. Martin")
+                .nationality("United States")
+                .dateOfBirth("1948/10/20")
                 .build();
+        AuthorDto savedAuthor = this.authorService.createAuthor(createAuthorDto);
 
-        Author savedAuthor = authorService.createAuthor(createAuthorDto);
-
-        List<Author> allAuthors = authorService.getAllAuthors();
+        List<AuthorDto> allAuthors = this.authorService.getAllAuthors();
         assertFalse(allAuthors.isEmpty());
-        assertEquals(allAuthors.size(), 1);
+        assertEquals(1, allAuthors.size());
 
-        Author myAuthor = allAuthors.get(0);
-        assertEquals(myAuthor, savedAuthor);
+        AuthorDto author = allAuthors.get(0);
+        assertEquals(author, savedAuthor);
 
 
-        CreateAuthorDto modifyAuthorDto = CreateAuthorDto.builder()
-                .name("Ray Bradbury")
-                .nationality("British")
-                .dateOfBirth(LocalDate.of(1903, 3, 19))
+        CreateAuthorDto updatedAuthorData = CreateAuthorDto.builder()
+                .name("George Martin")
+                .nationality("United States")
+                .dateOfBirth("1948/10/20")
                 .build();
-        Author savedUpdatedAuthor = authorService.modifyAuthor(myAuthor.getId(), modifyAuthorDto);
+        this.authorService.updateAuthor(author.getId(), updatedAuthorData);
+        assertEquals(this.authorService.getAllAuthors().get(0).getName(), "George Martin");
 
-        List<Author> updatedAuthors = authorService.getAllAuthors();
-        assertFalse(updatedAuthors.isEmpty());
-        assertEquals(1, updatedAuthors.size());
-
-        Author myUpdatedAuthor = updatedAuthors.get(0);
-        assertEquals(myUpdatedAuthor, savedUpdatedAuthor);
-        assertNotEquals(myUpdatedAuthor, myAuthor);
-
-        authorService.deleteAuthor(myUpdatedAuthor.getId());
-        assertTrue(authorService.getAllAuthors().isEmpty());
-
+        this.authorService.deleteAuthor(1L);
+        assertTrue(this.authorService.getAllAuthors().isEmpty());
     }
 
     @Test
-    void exceptionTest(){
-        assertThrows(NotFoundException.class, () -> authorService.getAuthor(1L));
+    void exceptionTest() {
+        assertThrows(NotFoundException.class, () -> this.authorService.getAuthor(1L));
     }
 }

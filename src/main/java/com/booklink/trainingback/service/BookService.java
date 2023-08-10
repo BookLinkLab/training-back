@@ -1,7 +1,10 @@
 package com.booklink.trainingback.service;
 
-import com.booklink.trainingback.dto.book.BookDto;
-import com.booklink.trainingback.dto.book.CreateBookDto;
+import com.booklink.trainingback.dto.BookDto;
+import com.booklink.trainingback.dto.BookWithAuthorIdDTO;
+import com.booklink.trainingback.dto.CreateBookDto;
+import com.booklink.trainingback.exception.AuthorDoesntExistExcpetion;
+import com.booklink.trainingback.exception.BookAlreadyExistsException;
 import com.booklink.trainingback.exception.NotFoundException;
 import com.booklink.trainingback.model.Author;
 import com.booklink.trainingback.model.Book;
@@ -10,71 +13,70 @@ import com.booklink.trainingback.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookService {
-
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
 
-
-    public BookService(BookRepository bookRepository, AuthorRepository authorRepository){
+    public BookService(BookRepository bookRepository, AuthorRepository authorRepository) {
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
     }
 
-
-    public Book createBook(CreateBookDto dto){
-        Author author = getAuthor(dto.getAuthorId());
-        Book book = Book.builder()
-                .title(dto.getTitle())
-                .isbn(dto.getIsbn())
-                .publishDate(dto.getPublishDate())
-                .author(author)
-                .build();
-        bookRepository.save(book);
-        return book;
+    public BookDto createBook(CreateBookDto bookDto) {
+        List<Author> authors = this.authorRepository.findAllById(bookDto.getAuthorIds());
+        if (authors.size() < bookDto.getAuthorIds().size()) {
+            throw new AuthorDoesntExistExcpetion("One or more author IDs not found");
+        }
+        if (this.bookRepository.findByIsbn(bookDto.getIsbn()).isPresent()) {
+            throw new BookAlreadyExistsException("Book with isbn %d already exists".formatted(bookDto.getIsbn()));
+        }
+        Book bookToSave = Book.from(bookDto, authors);
+        Book savedBook = this.bookRepository.save(bookToSave);
+        authors.forEach(a -> a.getBooks().add(savedBook));
+        return BookDto.from(savedBook);
     }
 
-    private Author getAuthor(Long authorId) {
-        return authorRepository.findById(authorId)
-                .orElseThrow(() -> new NotFoundException("Author %d not found".formatted(authorId)));
+    public void deleteBook(Long id) {
+        Book bookToDelete = this.bookRepository.findById(id).orElseThrow(() -> new NotFoundException("Book %d not found".formatted(id)));
+        this.bookRepository.delete(bookToDelete);
     }
 
-    public Book modifyBook(Long id, CreateBookDto dto){
-        Book book = getBook(id);
-        Author author = getAuthor(dto.getAuthorId());
-
-        book.setTitle(dto.getTitle());
-        book.setIsbn(dto.getIsbn());
-        book.setPublishDate(dto.getPublishDate());
-        book.setAuthor(author);
-        bookRepository.save(book);
-        return book;
+    public BookDto updateBook(Long id, CreateBookDto bookDto) {
+        Book bookToModify = this.bookRepository.findById(id).orElseThrow(() -> new NotFoundException("Book %d not found".formatted(id)));
+        List<Author> updatedAuthors = this.authorRepository.findAllById(bookDto.getAuthorIds());
+        bookToModify.setIsbn(bookDto.getIsbn());
+        bookToModify.setTitle(bookDto.getTitle());
+        bookToModify.setPublishDate(bookDto.getPublishDate());
+        bookToModify.setAuthors(updatedAuthors);
+        Book updatedBook = this.bookRepository.save(bookToModify);
+        return BookDto.from(updatedBook);
     }
 
-
-    public Book getBook(Long id){
-        return bookRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Book %d not found".formatted(id)));
+    public BookDto getBook(Long id) {
+        Optional<Book> bookOptional = this.bookRepository.findById(id);
+        Book book = bookOptional.orElseThrow(() -> new NotFoundException("Book %d not found".formatted(id)));
+        return BookDto.from(book);
     }
 
-    public Book getBookByIsbn(Long isbn){
-        return bookRepository.findByIsbn(isbn)
-                .orElseThrow(() -> new NotFoundException("Book %d not found".formatted(isbn)));
+    public BookDto getBookByIsbn(Long isbn) {
+        Book book = this.bookRepository.findByIsbn(isbn).orElseThrow(() -> new NotFoundException("Book %d not found".formatted(isbn)));
+        return BookDto.from(book);
     }
 
-    public void deleteBook(Long id){
-        bookRepository.deleteById(id);
+    public List<BookDto> getAllBooksFull() {
+        List<Book> books = this.bookRepository.findAll();
+        return books.stream()
+                .map(BookDto::from)
+                .toList();
     }
 
-    public List<BookDto> getBasicBooks(){
-        List<Book> books = bookRepository.findAll();
-        return books.stream().map(BookDto::from).toList();
+    public List<BookWithAuthorIdDTO> getAllBooksBasic() {
+        List<Book> books = this.bookRepository.findAll();
+        return books.stream()
+                .map(BookWithAuthorIdDTO::from)
+                .toList();
     }
-
-    public List<Book> getFullBooks(){
-        return bookRepository.findAll();
-    }
-
 }

@@ -1,16 +1,15 @@
 package com.booklink.trainingback.model;
 
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.booklink.trainingback.dto.CreateAuthorDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -18,7 +17,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class Author {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -27,5 +25,18 @@ public class Author {
 
     private String nationality;
 
-    private LocalDate dateOfBirth;
+    private String dateOfBirth;
+
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER)
+    List<Book> books;
+
+    public static Author from(CreateAuthorDto createAuthorDto) {
+        return Author.builder()
+                .name(createAuthorDto.getName())
+                .nationality(createAuthorDto.getNationality())
+                .dateOfBirth(createAuthorDto.getDateOfBirth())
+                .books(new ArrayList<>())
+                .build();
+    }
 }
