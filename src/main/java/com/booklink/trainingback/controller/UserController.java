@@ -2,11 +2,9 @@ package com.booklink.trainingback.controller;
 
 import com.booklink.trainingback.dto.CreateUserDto;
 import com.booklink.trainingback.dto.UserDto;
+import com.booklink.trainingback.dto.UserDtoWithPassword;
 import com.booklink.trainingback.service.impl.UserServiceImpl;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -20,5 +18,10 @@ public class UserController {
     @PostMapping
     public UserDto registerUser(@RequestBody CreateUserDto userDto) {
         return this.userService.registerUser(userDto);
+    }
+
+    @GetMapping("/{id}")
+    public UserDtoWithPassword getUser(@PathVariable Long id) {
+        return this.userService.getUserFull(id);
     }
 }
