@@ -22,6 +22,6 @@ public class UserController {
 
     @GetMapping("/{id}")
     public UserDtoWithPassword getUser(@PathVariable Long id) {
-        return this.userService.getUserFull(id);
+        return this.userService.getUserWithPassword(id);
     }
 }

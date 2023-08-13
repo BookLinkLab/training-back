@@ -30,7 +30,7 @@ public class UserServiceImpl implements com.booklink.trainingback.service.UserSe
     }
 
     @Override
-    public UserDtoWithPassword getUserFull(Long id) {
+    public UserDtoWithPassword getUserWithPassword(Long id) {
         Optional<User> userOptional = this.userRepository.findById(id);
         User user = userOptional.orElseThrow(() -> new NotFoundException("User %d not found".formatted(id)));
         return UserDtoWithPassword.from(user);

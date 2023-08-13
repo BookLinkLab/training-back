@@ -6,5 +6,5 @@ import com.booklink.trainingback.dto.UserDtoWithPassword;
 
 public interface UserService {
     UserDto registerUser(CreateUserDto userDto);
-    UserDtoWithPassword getUserFull(Long id);
+    UserDtoWithPassword getUserWithPassword(Long id);
 }
