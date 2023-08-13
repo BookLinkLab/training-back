@@ -2,7 +2,6 @@ package com.booklink.trainingback.service;
 
 import com.booklink.trainingback.dto.CreateUserDto;
 import com.booklink.trainingback.dto.UserDto;
-import com.booklink.trainingback.dto.UserDtoWithPassword;
 import com.booklink.trainingback.dto.UserResponse;
 
 public interface UserService {

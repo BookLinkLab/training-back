@@ -2,7 +2,6 @@ package com.booklink.trainingback.controller;
 
 import com.booklink.trainingback.dto.CreateUserDto;
 import com.booklink.trainingback.dto.UserDto;
-import com.booklink.trainingback.dto.UserDtoWithPassword;
 import com.booklink.trainingback.dto.UserResponse;
 import com.booklink.trainingback.exception.NotFoundException;
 import com.booklink.trainingback.service.impl.UserServiceImpl;

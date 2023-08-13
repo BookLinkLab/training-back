@@ -5,6 +5,7 @@ import com.booklink.trainingback.dto.UserDto;
 import com.booklink.trainingback.dto.UserDtoWithPassword;
 import com.booklink.trainingback.dto.UserResponse;
 import com.booklink.trainingback.exception.NotFoundException;
+import com.booklink.trainingback.exception.SpecialCharacterException;
 import com.booklink.trainingback.model.User;
 import com.booklink.trainingback.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +25,8 @@ public class UserServiceImpl implements com.booklink.trainingback.service.UserSe
 
     @Override
     public UserDto registerUser(CreateUserDto userDto) {
+        if (userDto.getPassword().contains("$"))
+            throw new SpecialCharacterException();
         String encryptedPassword = this.passwordEncoder.encode(userDto.getPassword());
         User userToSave = User.from(userDto, encryptedPassword);
         User savedUser = this.userRepository.save(userToSave);

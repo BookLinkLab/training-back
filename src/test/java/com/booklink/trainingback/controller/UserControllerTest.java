@@ -1,7 +1,6 @@
 package com.booklink.trainingback.controller;
 
 import com.booklink.trainingback.dto.*;
-import org.apache.coyote.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -57,10 +58,11 @@ public class UserControllerTest {
 
     @Test
     void getUser() {
-        ResponseEntity<UserDtoWithPassword> response = this.restTemplate.exchange(
-                this.baseUrl + "/1", HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        ResponseEntity<UserResponse> response = this.restTemplate.exchange(
+                this.baseUrl + "/1?template=full", HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                 }
         );
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(Objects.requireNonNull(response.getBody()).getUserDtoWithPassword().getPassword().contains("$"));
     }
 }
