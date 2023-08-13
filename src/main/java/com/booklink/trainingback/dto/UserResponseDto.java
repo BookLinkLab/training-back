@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserResponse {
+public class UserResponseDto {
     private UserDto userDto;
-    private UserDtoWithPassword userDtoWithPassword;
+    private UserWithPasswordDto userWithPasswordDto;
 }

@@ -2,10 +2,10 @@ package com.booklink.trainingback.service;
 
 import com.booklink.trainingback.dto.CreateUserDto;
 import com.booklink.trainingback.dto.UserDto;
-import com.booklink.trainingback.dto.UserResponse;
+import com.booklink.trainingback.dto.UserResponseDto;
 
 public interface UserService {
     UserDto registerUser(CreateUserDto userDto);
-    UserResponse getUser(Long id);
-    UserResponse getUserWithPassword(Long id);
+    UserResponseDto getUser(Long id);
+    UserResponseDto getUserWithPassword(Long id);
 }

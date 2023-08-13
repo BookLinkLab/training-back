@@ -57,12 +57,23 @@ public class UserControllerTest {
     }
 
     @Test
+    void registerUserSpecialCharacterException() {
+        CreateUserDto createUserDto = CreateUserDto.builder()
+                .username("test")
+                .email("springsecurity@spring.com")
+                .password("$")
+                .build();
+        ResponseEntity<UserDto> response = this.restTemplate.exchange(this.baseUrl, HttpMethod.POST, new HttpEntity<>(createUserDto), UserDto.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
     void getUser() {
-        ResponseEntity<UserResponse> response = this.restTemplate.exchange(
+        ResponseEntity<UserResponseDto> response = this.restTemplate.exchange(
                 this.baseUrl + "/1?template=full", HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                 }
         );
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(Objects.requireNonNull(response.getBody()).getUserDtoWithPassword().getPassword().contains("$"));
+        assertTrue(Objects.requireNonNull(response.getBody()).getUserWithPasswordDto().getPassword().contains("$"));
     }
 }

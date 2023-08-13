@@ -2,8 +2,8 @@ package com.booklink.trainingback.service.impl;
 
 import com.booklink.trainingback.dto.CreateUserDto;
 import com.booklink.trainingback.dto.UserDto;
-import com.booklink.trainingback.dto.UserDtoWithPassword;
-import com.booklink.trainingback.dto.UserResponse;
+import com.booklink.trainingback.dto.UserWithPasswordDto;
+import com.booklink.trainingback.dto.UserResponseDto;
 import com.booklink.trainingback.exception.NotFoundException;
 import com.booklink.trainingback.exception.SpecialCharacterException;
 import com.booklink.trainingback.model.User;
@@ -26,7 +26,7 @@ public class UserServiceImpl implements com.booklink.trainingback.service.UserSe
     @Override
     public UserDto registerUser(CreateUserDto userDto) {
         if (userDto.getPassword().contains("$"))
-            throw new SpecialCharacterException();
+            throw new SpecialCharacterException("Special characters not allowed here");
         String encryptedPassword = this.passwordEncoder.encode(userDto.getPassword());
         User userToSave = User.from(userDto, encryptedPassword);
         User savedUser = this.userRepository.save(userToSave);
@@ -34,16 +34,16 @@ public class UserServiceImpl implements com.booklink.trainingback.service.UserSe
     }
 
     @Override
-    public UserResponse getUser(Long id) {
+    public UserResponseDto getUser(Long id) {
         Optional<User> userOptional = this.userRepository.findById(id);
         User user = userOptional.orElseThrow(() -> new NotFoundException("User %d not found".formatted(id)));
-        return UserResponse.builder().userDto(UserDto.from(user)).build();
+        return UserResponseDto.builder().userDto(UserDto.from(user)).build();
     }
 
     @Override
-    public UserResponse getUserWithPassword(Long id) {
+    public UserResponseDto getUserWithPassword(Long id) {
         Optional<User> userOptional = this.userRepository.findById(id);
         User user = userOptional.orElseThrow(() -> new NotFoundException("User %d not found".formatted(id)));
-        return UserResponse.builder().userDtoWithPassword(UserDtoWithPassword.from(user)).build();
+        return UserResponseDto.builder().userWithPasswordDto(UserWithPasswordDto.from(user)).build();
     }
 }

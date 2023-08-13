@@ -7,14 +7,14 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserDtoWithPassword {
+public class UserWithPasswordDto {
     private Long id;
     private String username;
     private String email;
     private String password;
 
-    public static UserDtoWithPassword from(@NonNull User user) {
-        return UserDtoWithPassword.builder()
+    public static UserWithPasswordDto from(@NonNull User user) {
+        return UserWithPasswordDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
