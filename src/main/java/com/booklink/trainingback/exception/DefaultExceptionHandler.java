@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class DefaultExceptionHandler {
 
-    Logger logger = LoggerFactory.getLogger(DefaultExceptionHandler.class);
+    final Logger logger = LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
     @ExceptionHandler(NotFoundException.class)
     protected ResponseEntity<Object> handleEntityNotFound(NotFoundException exception){

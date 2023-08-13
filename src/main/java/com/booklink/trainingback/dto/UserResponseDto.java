@@ -1,5 +1,6 @@
 package com.booklink.trainingback.dto;
 
+import com.booklink.trainingback.model.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,4 +15,14 @@ import lombok.NoArgsConstructor;
 public class UserResponseDto {
     private UserDto userDto;
     private UserWithPasswordDto userWithPasswordDto;
+
+    public static UserResponseDto from(User user) {
+        return UserResponseDto.builder()
+                .userDto(UserDto.builder()
+                        .id(user.getId())
+                        .username(user.getUsername())
+                        .email(user.getEmail())
+                        .build())
+                .build();
+    }
 }

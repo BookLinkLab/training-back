@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -75,5 +76,14 @@ public class UserControllerTest {
         );
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue(Objects.requireNonNull(response.getBody()).getUserWithPasswordDto().getPassword().contains("$"));
+    }
+
+    @Test
+    void getAllUsers() {
+        ResponseEntity<List<UserResponseDto>> responseBasic = this.restTemplate.exchange(
+                this.baseUrl, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                }
+        );
+        assertEquals(HttpStatus.OK, responseBasic.getStatusCode());
     }
 }

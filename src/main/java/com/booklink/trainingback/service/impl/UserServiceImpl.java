@@ -1,16 +1,15 @@
 package com.booklink.trainingback.service.impl;
 
-import com.booklink.trainingback.dto.CreateUserDto;
-import com.booklink.trainingback.dto.UserDto;
-import com.booklink.trainingback.dto.UserWithPasswordDto;
-import com.booklink.trainingback.dto.UserResponseDto;
+import com.booklink.trainingback.dto.*;
 import com.booklink.trainingback.exception.NotFoundException;
 import com.booklink.trainingback.exception.SpecialCharacterException;
+import com.booklink.trainingback.model.Author;
 import com.booklink.trainingback.model.User;
 import com.booklink.trainingback.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,5 +44,11 @@ public class UserServiceImpl implements com.booklink.trainingback.service.UserSe
         Optional<User> userOptional = this.userRepository.findById(id);
         User user = userOptional.orElseThrow(() -> new NotFoundException("User %d not found".formatted(id)));
         return UserResponseDto.builder().userWithPasswordDto(UserWithPasswordDto.from(user)).build();
+    }
+
+    @Override
+    public List<UserResponseDto> getAllUsers() {
+        List<User> users = this.userRepository.findAll();
+        return users.stream().map(UserResponseDto::from).toList();
     }
 }

@@ -4,15 +4,17 @@ import com.booklink.trainingback.dto.CreateUserDto;
 import com.booklink.trainingback.dto.UserDto;
 import com.booklink.trainingback.dto.UserResponseDto;
 import com.booklink.trainingback.exception.NotFoundException;
-import com.booklink.trainingback.service.impl.UserServiceImpl;
+import com.booklink.trainingback.service.UserService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
-    public UserController(UserServiceImpl userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
@@ -30,5 +32,10 @@ public class UserController {
             return this.userService.getUser(id);
         }
         throw new NotFoundException("Template %s not found".formatted(id));
+    }
+
+    @GetMapping()
+    public List<UserResponseDto> getAllUsers() {
+        return this.userService.getAllUsers();
     }
 }
