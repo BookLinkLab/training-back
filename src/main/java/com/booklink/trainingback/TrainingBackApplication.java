@@ -8,5 +8,4 @@ public class TrainingBackApplication {
     public static void main(String[] args) {
         SpringApplication.run(TrainingBackApplication.class, args);
     }
-
 }

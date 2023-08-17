@@ -9,11 +9,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class DefaultExceptionHandler {
 
-    Logger logger = LoggerFactory.getLogger(DefaultExceptionHandler.class);
+    final Logger logger = LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
     @ExceptionHandler(NotFoundException.class)
     protected ResponseEntity<Object> handleEntityNotFound(NotFoundException exception){
-        logger.info(exception.getMessage());
+        this.logger.info(exception.getMessage());
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(SpecialCharacterException.class)
+    protected ResponseEntity<Object> handleSpecialCharacterNotFound(SpecialCharacterException exception){
+        this.logger.info(exception.getMessage());
+        return ResponseEntity.badRequest().build();
     }
 }
